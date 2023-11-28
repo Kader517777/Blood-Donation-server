@@ -44,7 +44,7 @@ async function run() {
             const query = { email: userEmail }
             const result = await createDonationRequestCollection.find(query).toArray();
             console.log(result);
-            res.send(result)
+            res.send(result);
         })
         // user post
         app.post('/users', async (req, res) => {
