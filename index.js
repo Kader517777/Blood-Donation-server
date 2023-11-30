@@ -28,22 +28,39 @@ async function run() {
 
         const usersCollection = client.db("Blood-Donation").collection("users");
         const createDonationRequestCollection = client.db("Blood-Donation").collection("createDonationRequest");
+        const blogsCollection = client.db("Blood-Donation").collection("blogsCollection");
         // user get 
+        app.get('/', async (req, res) => {
+            res.send({ success: 'get data' })
+        })
+
         app.get('/user/:email', async (req, res) => {
             const userEmail = req.params.email;
-            console.log(userEmail);
             const query = { email: userEmail }
             const result = await usersCollection.findOne(query)
-            console.log(result);
             res.send(result)
+        })
+        //all users get 
+        app.get('/users', async (req, res) => {
+
+            const result = await usersCollection.find().toArray();
+            res.send(result)
+        })
+        //all my request donation get
+        app.get('/requestDonation', async (req, res) => {
+            const result = await createDonationRequestCollection.find().toArray();
+            res.send(result);
+        })
+        //All Blogs get
+        app.get('/allBlogs', async (req, res) => {
+            const result = await blogsCollection.find().toArray();
+            res.send(result);
         })
         // my request donation get
         app.get('/requestDonation/:email', async (req, res) => {
             const userEmail = req.params.email;
-            console.log(userEmail);
             const query = { email: userEmail }
             const result = await createDonationRequestCollection.find(query).toArray();
-            console.log(result);
             res.send(result);
         })
         // user post
@@ -54,7 +71,6 @@ async function run() {
             if (isExiting) {
                 return res.send({ result: 'alredy exits user' })
             }
-            console.log(isExiting);
             const result = await usersCollection.insertOne(user);
             res.send(result)
         });
@@ -63,6 +79,59 @@ async function run() {
             const user = req.body;
             const result = await createDonationRequestCollection.insertOne(user);
             res.send(result)
+        });
+        // Blog post
+        app.post('/addblog', async (req, res) => {
+            const user = req.body;
+            const result = await blogsCollection.insertOne(user);
+            res.send(result)
+        });
+        // status and role change patch
+        app.patch('/statusRole', async (req, res) => {
+            const userEmail = req?.body?.email;
+            const userstatusRole = req?.body?.statusRole;
+
+            const filter = { email: userEmail };
+
+            if (userstatusRole === 'active') {
+                const updateDoc = {
+                    $set: {
+                        status: `${userstatusRole}`
+                    },
+                };
+                const result = await usersCollection.updateOne(filter, updateDoc);
+                res.send(result)
+            }
+            else if (userstatusRole === 'blocked') {
+                const updateDoc = {
+                    $set: {
+                        status: `${userstatusRole}`
+                    },
+                };
+                const result = await usersCollection.updateOne(filter, updateDoc);
+                res.send(result)
+            }
+            else if (userstatusRole === 'volunteer') {
+                const updateDoc = {
+                    $set: {
+                        role: `${userstatusRole}`
+                    },
+                };
+                const result = await usersCollection.updateOne(filter, updateDoc);
+                res.send(result)
+            }
+            else if (userstatusRole === 'admin') {
+                const updateDoc = {
+                    $set: {
+                        role: `${userstatusRole}`
+                    },
+                };
+                const result = await usersCollection.updateOne(filter, updateDoc);
+                res.send(result)
+            }
+            else {
+                res.send({ massage: 'unsuccess' })
+            }
         });
 
 
